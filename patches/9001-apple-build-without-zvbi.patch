@@ -1,0 +1,36 @@
+From 7c2f79045c197e6d20f12ac6c8d44f3ded104453 Mon Sep 17 00:00:00 2001
+From: Ara Hacopian <ara@hacopian.de>
+Date: Sat, 3 Oct 2026 14:08:38 +0200
+Subject: [PATCH] apple: build without zvbi
+
+zvbi's src/pdc.c and src/packet-830.c are GPL-2.0-only, which the Apple
+builds' --disable-gpl otherwise keeps out. Without zvbi, configure enables
+the telx module, which still decodes teletext subtitles.
+---
+ extras/package/apple/build.conf | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/extras/package/apple/build.conf b/extras/package/apple/build.conf
+index 8e53914..ea1587c 100644
+--- a/extras/package/apple/build.conf
++++ b/extras/package/apple/build.conf
+@@ -34,7 +34,7 @@ export VLC_CONTRIB_OPTIONS_BASE=(
+     --enable-ad-clauses
+     --disable-disc
+     --disable-iconv
+-    --enable-zvbi
++    --disable-zvbi
+     --disable-kate
+     --disable-caca
+     --disable-gettext
+@@ -154,6 +154,7 @@ export VLC_CONFIG_OPTIONS_BASE=(
+     --disable-sparkle
+     --disable-addonmanagermodules
+     --disable-mad
++    --disable-zvbi
+ )
+ 
+ # Additional configure options for macOS
+-- 
+2.54.0 (Apple Git-157)
+
