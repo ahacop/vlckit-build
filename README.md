@@ -22,7 +22,7 @@ accepts.
 ## Using it
 
 ```swift
-.package(url: "https://github.com/ahacop/vlckit-build", exact: "4.0.0-a25")
+.package(url: "https://github.com/ahacop/vlckit-build", exact: "4.0.0-a25.1")
 ```
 
 The product is `VLCKit`, so `import VLCKit` is unchanged. Only iOS and the iOS
