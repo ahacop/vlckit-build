@@ -21,15 +21,19 @@ if [ ! -d "$work" ]; then
     mkdir -p work
     git -c advice.detachedHead=false clone --quiet --branch "$VLCKIT_TAG" https://code.videolan.org/videolan/VLCKit.git "$work"
 fi
-actual=$(git -C "$work" rev-parse HEAD)
+actual=$(git -C "$work" rev-parse "$VLCKIT_TAG^{commit}")
 if [ "$actual" != "$VLCKIT_COMMIT" ]; then
-    echo "$work is at $actual, but versions.env pins $VLCKIT_COMMIT" >&2
+    echo "VLCKit tag $VLCKIT_TAG is $actual, but versions.env pins $VLCKIT_COMMIT" >&2
     exit 1
 fi
 
+# patches/vlckit go on VLCKit itself as commits, so the source archive has them.
+git -C "$work" reset --quiet --hard "$VLCKIT_COMMIT"
+git -C "$work" -c user.name=vlckit-build -c user.email=vlckit-build@localhost am --quiet "$PWD"/patches/vlckit/*.patch
+
 # compileAndBuildVLCKit.sh applies libvlc/patches/*.patch in name order, so ours
 # (9xxx) go after VLCKit's. It resets libvlc/vlc and reapplies them on every run.
-cp patches/*.patch "$work/libvlc/patches/"
+cp patches/libvlc/*.patch "$work/libvlc/patches/"
 
 # compileAndBuildVLCKit.sh replaces PATH with only python.org's framework Python
 # and /usr/bin, whose tools are too old for this build:
@@ -69,7 +73,7 @@ xcframework=$work/build/iOS/VLCKit.xcframework
 echo "== checking $xcframework"
 for binary in "$xcframework"/*/VLCKit.framework/VLCKit; do
     symbols=$(nm "$binary")
-    if grep -q -e ' _vbi_' -e 'vlc_entry__codec_zvbi' <<<"$symbols"; then
+    if grep -q -E ' _vbi_|vlc_entry__codec_(lib)?zvbi' <<<"$symbols"; then
         echo "$binary still contains zvbi" >&2
         exit 1
     fi

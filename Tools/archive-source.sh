@@ -7,7 +7,8 @@
 #
 # writes dist/VLCKit-<tag>-source.tar with:
 #   VLCKit-<tag>.tar.gz        VLCKit at the tag in versions.env, with
-#                              patches/ added to libvlc/patches
+#                              patches/vlckit applied and patches/libvlc
+#                              added to libvlc/patches
 #   vlc-<hash>-patched.tar.gz  libVLC at the commit VLCKit builds on, with all
 #                              of libvlc/patches applied, as the build did
 #   contrib-tarballs/          the source of every third-party library the
@@ -24,7 +25,8 @@ vlc=$work/libvlc/vlc
 test -d "$vlc/contrib/tarballs" || { echo "No build in $work; run Tools/build.sh first" >&2; exit 1; }
 tested=$(sed -n 's/^TESTEDHASH="\([0-9a-f]*\)".*/\1/p' "$work/compileAndBuildVLCKit.sh")
 described=$(git -C "$vlc" describe --tags --match '4.0.0-dev' HEAD)
-ours=$(cd patches && ls *.patch)
+vlckit_patches=$(cd patches/vlckit && ls *.patch)
+libvlc_patches=$(cd patches/libvlc && ls *.patch)
 
 stage=$(mktemp -d)
 trap 'rm -rf "$stage"' EXIT
@@ -34,8 +36,8 @@ mkdir -p "$out/contrib-tarballs"
 
 echo "== VLCKit $VLCKIT_TAG"
 git -C "$work" archive --format=tar --prefix="VLCKit-$VLCKIT_TAG/" -o "$stage/vlckit.tar" HEAD
-for patch in $ours; do
-    tar -rf "$stage/vlckit.tar" -s ",^patches/,VLCKit-$VLCKIT_TAG/libvlc/patches/," "patches/$patch"
+for patch in $libvlc_patches; do
+    tar -rf "$stage/vlckit.tar" -s ",^patches/libvlc/,VLCKit-$VLCKIT_TAG/libvlc/patches/," "patches/libvlc/$patch"
 done
 gzip -c "$stage/vlckit.tar" >"$out/VLCKit-$VLCKIT_TAG.tar.gz"
 
@@ -51,9 +53,10 @@ https://github.com/ahacop/vlckit-build, provided under the GNU LGPL 2.1.
 
 VLCKit-$VLCKIT_TAG.tar.gz
     VLCKit at tag $VLCKIT_TAG (commit $VLCKIT_COMMIT), from
-    https://code.videolan.org/videolan/VLCKit, with these patches added to
-    libvlc/patches:
-$(sed 's/^/      /' <<<"$ours")
+    https://code.videolan.org/videolan/VLCKit, with these patches applied:
+$(sed 's/^/      /' <<<"$vlckit_patches")
+    and these added to libvlc/patches:
+$(sed 's/^/      /' <<<"$libvlc_patches")
     compileAndBuildVLCKit.sh is the build script.
 
 vlc-$tested-patched.tar.gz

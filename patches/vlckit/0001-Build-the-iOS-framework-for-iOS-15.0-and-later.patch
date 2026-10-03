@@ -1,0 +1,27 @@
+From 46ad96a9eef533532d11c96687ff65e2b10c5a20 Mon Sep 17 00:00:00 2001
+From: Ara Hacopian <ara@hacopian.de>
+Date: Sat, 3 Oct 2026 14:46:51 +0200
+Subject: [PATCH] Build the iOS framework for iOS 15.0 and later
+
+Xcode 27 only supports iOS deployment targets from 15.0, so archiving
+VLCKit with IPHONEOS_DEPLOYMENT_TARGET=9.0 fails.
+---
+ compileAndBuildVLCKit.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/compileAndBuildVLCKit.sh b/compileAndBuildVLCKit.sh
+index 8ca10bf1..ae7d3e0a 100755
+--- a/compileAndBuildVLCKit.sh
++++ b/compileAndBuildVLCKit.sh
+@@ -8,7 +8,7 @@ BUILD_DEVICE=yes
+ BUILD_SIMULATOR=yes
+ BUILD_FRAMEWORK=no
+ SDK_VERSION=`xcrun --sdk iphoneos --show-sdk-version`
+-SDK_MIN=9.0
++SDK_MIN=15.0
+ VERBOSE=no
+ DISABLEDEBUG=no
+ CONFIGURATION="Debug"
+-- 
+2.54.0 (Apple Git-157)
+

@@ -32,7 +32,7 @@ import PackageDescription
 
 let package = Package(
     name: "VLCKit",
-    platforms: [.iOS(.v12)],
+    platforms: [.iOS(.v15)],
     products: [
         .library(name: "VLCKit", targets: ["VLCKit"])
     ],
