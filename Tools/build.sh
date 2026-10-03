@@ -86,6 +86,8 @@ done
 
 rm -rf dist
 mkdir dist
-ditto -c -k --keepParent "$xcframework" dist/VLCKit.xcframework.zip
+# --norsrc --noextattr: without them ditto stores extended attributes as ._* files,
+# which break the VLCKit module and end up in apps that embed it.
+ditto -c -k --norsrc --noextattr --noacl --keepParent "$xcframework" dist/VLCKit.xcframework.zip
 swift package compute-checksum dist/VLCKit.xcframework.zip >dist/VLCKit.xcframework.zip.checksum
 echo "== dist/VLCKit.xcframework.zip ($(du -h dist/VLCKit.xcframework.zip | cut -f1), checksum $(cat dist/VLCKit.xcframework.zip.checksum))"
